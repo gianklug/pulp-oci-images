@@ -180,24 +180,24 @@ jobs:
         run: |
           branch=${{ github.base_ref || github.ref_name }}
           if [[ ${{ steps.build_base_images.outputs.rebuilt_images }} == "true" ]]; then
-            podman push pulp/base:ci ghcr.io/pulp/base:${TAG}
-            podman push pulp/pulp-ci-centos9:ci ghcr.io/pulp/pulp-ci-centos9:${TAG}
-            image_names="ghcr.io/pulp/base:${TAG} ghcr.io/pulp/pulp-ci-centos9:${TAG}"
+            podman push ${GITHUB_REPOSITORY_OWNER}/base:ci ghcr.io/${GITHUB_REPOSITORY_OWNER}/base:${TAG}
+            podman push ${GITHUB_REPOSITORY_OWNER}/pulp-ci-centos9:ci ghcr.io/${GITHUB_REPOSITORY_OWNER}/pulp-ci-centos9:${TAG}
+            image_names="ghcr.io/${GITHUB_REPOSITORY_OWNER}/base:${TAG} ghcr.io/${GITHUB_REPOSITORY_OWNER}/pulp-ci-centos9:${TAG}"
           else
-            image_names="ghcr.io/pulp/base:${branch} ghcr.io/pulp/pulp-ci-centos9:${branch}"
+            image_names="ghcr.io/${GITHUB_REPOSITORY_OWNER}/base:${branch} ghcr.io/${GITHUB_REPOSITORY_OWNER}/pulp-ci-centos9:${branch}"
           fi
           if [[ ${{ steps.build_pulp_minimal_image.outputs.rebuilt_images }} == "true" ]]; then
-            podman push pulp/pulp-minimal:ci ghcr.io/pulp/pulp-minimal:${TAG}
-            podman push pulp/pulp-web:ci ghcr.io/pulp/pulp-web:${TAG}
-            image_names="${image_names} ghcr.io/pulp/pulp-minimal:${TAG} ghcr.io/pulp/pulp-web:${TAG}"
+            podman push ${GITHUB_REPOSITORY_OWNER}/pulp-minimal:ci ghcr.io/${GITHUB_REPOSITORY_OWNER}/pulp-minimal:${TAG}
+            podman push ${GITHUB_REPOSITORY_OWNER}/pulp-web:ci ghcr.io/${GITHUB_REPOSITORY_OWNER}/pulp-web:${TAG}
+            image_names="${image_names} ghcr.io/${GITHUB_REPOSITORY_OWNER}/pulp-minimal:${TAG} ghcr.io/${GITHUB_REPOSITORY_OWNER}/pulp-web:${TAG}"
           else
-            image_names="${image_names} ghcr.io/pulp/pulp-minimal:${branch} ghcr.io/pulp/pulp-web:${branch}"
+            image_names="${image_names} ghcr.io/${GITHUB_REPOSITORY_OWNER}/pulp-minimal:${branch} ghcr.io/${GITHUB_REPOSITORY_OWNER}/pulp-web:${branch}"
           fi
           if [[ ${{ steps.build_pulp_image.outputs.rebuilt_images }} == "true" ]]; then
-            podman push pulp/pulp:ci ghcr.io/pulp/pulp:${TAG}
-            image_names="${image_names} ghcr.io/pulp/pulp:${TAG}"
+            podman push ${GITHUB_REPOSITORY_OWNER}/pulp:ci ghcr.io/${GITHUB_REPOSITORY_OWNER}/pulp:${TAG}
+            image_names="${image_names} ghcr.io/${GITHUB_REPOSITORY_OWNER}/pulp:${TAG}"
           else
-            image_names="${image_names} ghcr.io/pulp/pulp:${branch}"
+            image_names="${image_names} ghcr.io/${GITHUB_REPOSITORY_OWNER}/pulp:${branch}"
           fi
           echo "Image names: ${image_names}"
           echo "image_names=${image_names}" >> $GITHUB_ENV
@@ -285,11 +285,11 @@ jobs:
             base_digests=(${{ env.base_digests }})
             pulp_ci_centos9_digests=(${{ env.pulp_ci_centos9_digests }})
             podman pull "ghcr.io/pulp/base@${base_digests[0]}" "ghcr.io/pulp/base@${base_digests[1]}"
-            podman tag "ghcr.io/pulp/base@${base_digests[0]}" pulp/base:ci-arm64
-            podman tag "ghcr.io/pulp/base@${base_digests[1]}" pulp/base:ci-amd64
+            podman tag "ghcr.io/pulp/base@${base_digests[0]}" ${GITHUB_REPOSITORY_OWNER}/base:ci-arm64
+            podman tag "ghcr.io/pulp/base@${base_digests[1]}" ${GITHUB_REPOSITORY_OWNER}/base:ci-amd64
             podman pull "ghcr.io/pulp/pulp-ci-centos9@${pulp_ci_centos9_digests[0]}" "ghcr.io/pulp/pulp-ci-centos9@${pulp_ci_centos9_digests[1]}"
-            podman tag "ghcr.io/pulp/pulp-ci-centos9@${pulp_ci_centos9_digests[0]}" pulp/pulp-ci-centos9:ci-arm64
-            podman tag "ghcr.io/pulp/pulp-ci-centos9@${pulp_ci_centos9_digests[1]}" pulp/pulp-ci-centos9:ci-amd64
+            podman tag "ghcr.io/pulp/pulp-ci-centos9@${pulp_ci_centos9_digests[0]}" ${GITHUB_REPOSITORY_OWNER}/pulp-ci-centos9:ci-arm64
+            podman tag "ghcr.io/pulp/pulp-ci-centos9@${pulp_ci_centos9_digests[1]}" ${GITHUB_REPOSITORY_OWNER}/pulp-ci-centos9:ci-amd64
             images="base pulp-ci-centos9"
           fi
           if [[ ${{ contains(env.rebuilt_minimal_images, 'true') }} == 'true' ]]; then
@@ -297,17 +297,17 @@ jobs:
             pulp_web_digests=(${{ env.pulp_web_digests }})
             podman pull "ghcr.io/pulp/pulp-minimal@${pulp_minimal_digests[0]}" "ghcr.io/pulp/pulp-minimal@${pulp_minimal_digests[1]}"
             podman pull "ghcr.io/pulp/pulp-web@${pulp_web_digests[0]}" "ghcr.io/pulp/pulp-web@${pulp_web_digests[1]}"
-            podman tag "ghcr.io/pulp/pulp-minimal@${pulp_minimal_digests[0]}" pulp/pulp-minimal:ci-arm64
-            podman tag "ghcr.io/pulp/pulp-minimal@${pulp_minimal_digests[1]}" pulp/pulp-minimal:ci-amd64
-            podman tag "ghcr.io/pulp/pulp-web@${pulp_web_digests[0]}" pulp/pulp-web:ci-arm64
-            podman tag "ghcr.io/pulp/pulp-web@${pulp_web_digests[1]}" pulp/pulp-web:ci-amd64
+            podman tag "ghcr.io/pulp/pulp-minimal@${pulp_minimal_digests[0]}" ${GITHUB_REPOSITORY_OWNER}/pulp-minimal:ci-arm64
+            podman tag "ghcr.io/pulp/pulp-minimal@${pulp_minimal_digests[1]}" ${GITHUB_REPOSITORY_OWNER}/pulp-minimal:ci-amd64
+            podman tag "ghcr.io/pulp/pulp-web@${pulp_web_digests[0]}" ${GITHUB_REPOSITORY_OWNER}/pulp-web:ci-arm64
+            podman tag "ghcr.io/pulp/pulp-web@${pulp_web_digests[1]}" ${GITHUB_REPOSITORY_OWNER}/pulp-web:ci-amd64
             images="${images} pulp-minimal pulp-web"
           fi
           if [[ ${{ contains(env.rebuilt_pulp_image, 'true') }} == 'true' ]]; then
             pulp_digests=(${{ env.pulp_digests }})
             podman pull "ghcr.io/pulp/pulp@${pulp_digests[0]}" "ghcr.io/pulp/pulp@${pulp_digests[1]}"
-            podman tag "ghcr.io/pulp/pulp@${pulp_digests[0]}" pulp/pulp:ci-arm64
-            podman tag "ghcr.io/pulp/pulp@${pulp_digests[1]}" pulp/pulp:ci-amd64
+            podman tag "ghcr.io/pulp/pulp@${pulp_digests[0]}" ${GITHUB_REPOSITORY_OWNER}/pulp:ci-arm64
+            podman tag "ghcr.io/pulp/pulp@${pulp_digests[1]}" ${GITHUB_REPOSITORY_OWNER}/pulp:ci-amd64
             images="${images} pulp"
           fi
           podman images -a

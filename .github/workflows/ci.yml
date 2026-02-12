@@ -176,9 +176,9 @@ jobs:
 
     - name: Build pulp-minimal and pulp-web images
       run: |
-        docker build -f images/Containerfile.core.base -t pulp/base:latest .
-        docker build -f images/pulp-minimal/stable/Containerfile.core -t localhost/pulp/pulp-minimal:ci .
-        docker build -f images/pulp-minimal/stable/Containerfile.webserver -t localhost/pulp/pulp-web:ci .
+        docker build -f images/Containerfile.core.base -t ${GITHUB_REPOSITORY_OWNER}/base:latest .
+        docker build -f images/pulp-minimal/stable/Containerfile.core -t localhost/${GITHUB_REPOSITORY_OWNER}/pulp-minimal:ci .
+        docker build -f images/pulp-minimal/stable/Containerfile.webserver -t localhost/${GITHUB_REPOSITORY_OWNER}/pulp-web:ci .
         docker images
       shell: bash
 
@@ -193,7 +193,7 @@ jobs:
         kubectl config set-context --current --namespace=pulp-operator-system
         kubectl apply -f .ci/assets/kubernetes/pulp-admin-password.secret.yaml
         kubectl apply -f config/samples/k8s_versions_ci.yaml
-        kubectl patch pulp example-pulp --type=merge -p '{"spec":{"image": "localhost/pulp/pulp-minimal","image_version": "ci", "image_web": "localhost/pulp/pulp-web","image_web_version": "ci"}}'
+        kubectl patch pulp example-pulp --type=merge -p '{"spec":{"image": "localhost/${GITHUB_REPOSITORY_OWNER}/pulp-minimal","image_version": "ci", "image_web": "localhost/${GITHUB_REPOSITORY_OWNER}/pulp-web","image_web_version": "ci"}}'
         make deploy
       shell: bash
 
